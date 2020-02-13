@@ -9,8 +9,6 @@ SUPPORTED_PRODUCTS = [
     "DataGrip",
     "RubyMine"]
 
-REGISTRY_BASE_PATH = "HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains"
-
 USER_FOLDER = os.getenv("USERPROFILE")
 assert USER_FOLDER is not None
 
@@ -64,7 +62,7 @@ if __name__ == '__main__':
     for settings_folder in test_product_settings_folders:
         remove_folder(f"{settings_folder}\\config\\eval")
         remove_string(f"{settings_folder}\\config\\options\\other.xml", "evlsprt")
-        remove_reg_key(f"{REGISTRY_BASE_PATH}\\datagrip")
+        remove_reg_key(f"HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains\\{test_product.lower()}")
 
 # TODO Add Enum with exclusion for "idea"
 # TODO Add logging to file (+ gitignore)
