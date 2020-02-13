@@ -65,3 +65,11 @@ if __name__ == '__main__':
         remove_folder(f"{settings_folder}\\config\\eval")
         remove_string(f"{settings_folder}\\config\\options\\other.xml", "evlsprt")
         remove_reg_key(f"{REGISTRY_BASE_PATH}\\datagrip")
+
+# TODO Add Enum with exclusion for "idea"
+# TODO Add logging to file (+ gitignore)
+# TODO Add argparse (with all support)
+# TODO Show detected products (by settings folder)
+# TODO Add interactive mode if no args provided
+# TODO Exception handling and more asserts
+# TODO Correct comments in doc-style
