@@ -46,6 +46,10 @@ if __name__ == '__main__':
     all_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
                             if f.is_dir() and is_settings_folder(f.name)]
 
+    if not all_settings_folders:
+        print("No JetBrains products were found on this computer!")
+        exit(0)
+
     all_installed_products = [Product.product_item(settings_path)
                               for settings_path in all_settings_folders]
 
