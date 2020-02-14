@@ -1,17 +1,7 @@
 import os
 import shutil
 import subprocess
-
-SUPPORTED_PRODUCTS = [
-    "CLion",
-    "DataGrip",
-    "GoLand",
-    "IntelliJIdea",
-    "PhpStorm",
-    "PyCharm",
-    "Rider",
-    "RubyMine",
-    "WebStorm"]
+from jetbrains.products import Product
 
 USER_FOLDER = os.getenv("USERPROFILE")
 assert USER_FOLDER is not None
@@ -19,7 +9,7 @@ assert USER_FOLDER is not None
 
 def is_settings_folder(folder_name):
     return any([folder_name.startswith(f".{name}")
-                for name in SUPPORTED_PRODUCTS])
+                for name in Product.folders_list()])
 
 
 def remove_folder(folder_path):
@@ -52,10 +42,11 @@ def remove_reg_key(reg_key_path):
 
 
 if __name__ == '__main__':
-    test_product = "DataGrip"
-
     all_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
                             if f.is_dir() and is_settings_folder(f.name)]
+
+    test_product = "DataGrip"
+
     test_product_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
                                      if f.is_dir() and f.name.startswith(f".{test_product}")]
 
@@ -64,7 +55,7 @@ if __name__ == '__main__':
         remove_string(f"{settings_folder}\\config\\options\\other.xml", "evlsprt")
         remove_reg_key(f"HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains\\{test_product.lower()}")
 
-# TODO Add Enum with exclusion for "idea"
+
 # TODO Add logging to file (+ gitignore)
 # TODO Add argparse (with all support)
 # TODO Show detected products (by settings folder)
