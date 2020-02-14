@@ -53,12 +53,14 @@ if __name__ == '__main__':
     [print(f" - {product.product.folder_name} ({product.product.name})")
      for product in all_installed_products]
 
-    product_codes_to_reset_str = input("\nEnter the product code(s) (separated by space) to reset trial: ")
+    product_codes_to_reset_str = input("\nEnter the product code(s) (separated by space) or ALL to reset trial: ")
 
-    product_codes_to_reset = [code.upper() for code in product_codes_to_reset_str.split(sep=" ")]
-
-    products_to_reset = [product for product in all_installed_products
-                         if product.product.name in product_codes_to_reset]
+    if product_codes_to_reset_str.strip().upper() == "ALL":
+        products_to_reset = all_installed_products
+    else:
+        product_codes_to_reset = [code.upper() for code in product_codes_to_reset_str.split(sep=" ")]
+        products_to_reset = [product for product in all_installed_products
+                             if product.product.name in product_codes_to_reset]
 
     for product_item in products_to_reset:
         remove_folder(f"{product_item.settings_path}\\config\\eval")
@@ -71,3 +73,4 @@ if __name__ == '__main__':
 # TODO Exception handling and more asserts
 # TODO Correct comments in doc-style
 # TODO move main code to class
+# TODO use Popen and find the correct encoding
