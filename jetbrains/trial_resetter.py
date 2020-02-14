@@ -1,6 +1,7 @@
 import os
 import shutil
 import subprocess
+
 from jetbrains.products import Product
 
 USER_FOLDER = os.getenv("USERPROFILE")
@@ -45,20 +46,28 @@ if __name__ == '__main__':
     all_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
                             if f.is_dir() and is_settings_folder(f.name)]
 
-    test_product = "DataGrip"
+    all_installed_products = [Product.product_item(settings_path)
+                              for settings_path in all_settings_folders]
 
-    test_product_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
-                                     if f.is_dir() and f.name.startswith(f".{test_product}")]
+    print("\nFound the following installed JetBrains products:")
+    [print(f" - {product.product.folder_name} ({product.product.name})")
+     for product in all_installed_products]
 
-    for settings_folder in test_product_settings_folders:
-        remove_folder(f"{settings_folder}\\config\\eval")
-        remove_string(f"{settings_folder}\\config\\options\\other.xml", "evlsprt")
-        remove_reg_key(f"HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains\\{test_product.lower()}")
+    product_codes_to_reset_str = input("\nEnter the product code(s) (separated by space) to reset trial: ")
+
+    product_codes_to_reset = [code.upper() for code in product_codes_to_reset_str.split(sep=" ")]
+
+    products_to_reset = [product for product in all_installed_products
+                         if product.product.name in product_codes_to_reset]
+
+    for product_item in products_to_reset:
+        remove_folder(f"{product_item.settings_path}\\config\\eval")
+        remove_string(f"{product_item.settings_path}\\config\\options\\other.xml", "evlsprt")
+        remove_reg_key(f"HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains\\{product_item.product.reg_key_name}")
 
 
 # TODO Add logging to file (+ gitignore)
 # TODO Add argparse (with all support)
-# TODO Show detected products (by settings folder)
-# TODO Add interactive mode if no args provided
 # TODO Exception handling and more asserts
 # TODO Correct comments in doc-style
+# TODO move main code to class
