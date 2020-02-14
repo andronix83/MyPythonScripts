@@ -3,11 +3,15 @@ import shutil
 import subprocess
 
 SUPPORTED_PRODUCTS = [
-    "IntelliJIdea",
-    "PyCharm",
-    "WebStorm",
+    "CLion",
     "DataGrip",
-    "RubyMine"]
+    "GoLand",
+    "IntelliJIdea",
+    "PhpStorm",
+    "PyCharm",
+    "Rider",
+    "RubyMine",
+    "WebStorm"]
 
 USER_FOLDER = os.getenv("USERPROFILE")
 assert USER_FOLDER is not None
