@@ -32,15 +32,11 @@ def remove_folder(folder_path):
 def remove_string(src_file_path, search_string):
     tmp_file_path = src_file_path + ".tmp"
 
-    src_file = open(src_file_path, "r")
-    tmp_file = open(tmp_file_path, "w")
-
-    for line in src_file:
-        if search_string not in line:
-            print(line, end="", file=tmp_file)
-
-    src_file.close()
-    tmp_file.close()
+    with open(src_file_path, "r") as src_file:
+        with open(tmp_file_path, "w") as tmp_file:
+            for src_line in src_file:
+                if search_string not in src_line:
+                    tmp_file.write(src_line)
 
     os.remove(src_file_path)
     os.rename(tmp_file_path, src_file_path)
@@ -55,9 +51,9 @@ if __name__ == '__main__':
     test_product = "DataGrip"
 
     all_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
-                             if f.is_dir() and is_settings_folder(f.name)]
+                            if f.is_dir() and is_settings_folder(f.name)]
     test_product_settings_folders = [f.path for f in os.scandir(USER_FOLDER)
-                                    if f.is_dir() and f.name.startswith(f".{test_product}")]
+                                     if f.is_dir() and f.name.startswith(f".{test_product}")]
 
     for settings_folder in test_product_settings_folders:
         remove_folder(f"{settings_folder}\\config\\eval")
