@@ -26,7 +26,9 @@ class Product(Enum):
 
     @classmethod
     def folders_list(cls):
-        return [p.folder_name for p in cls]
+        if not hasattr(cls, "_folders_list"):
+            cls._folders_list = [p.folder_name for p in cls]
+        return cls._folders_list
 
     @classmethod
     def product_item(cls, settings_path):
