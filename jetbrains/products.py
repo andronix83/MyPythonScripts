@@ -19,7 +19,7 @@ class Product(Enum):
         self.reg_key_name = reg_key_name if reg_key_name else folder_name.lower()
 
     def __str__(self):
-        return f"Product.{self.name}(folder_name={self.folder_name}, reg_key_name={self.reg_key_name})"
+        return f"Product.{self.name}({self.folder_name=}, {self.reg_key_name=})"
 
     def __repr__(self):
         return self.__str__()
@@ -32,14 +32,8 @@ class Product(Enum):
 
     @classmethod
     def product_item(cls, settings_path):
-        result_product = None
-        # TODO: Think how to rewrite it in a more functional way
-        for product in cls:
-            if product.folder_name in settings_path:
-                result_product = product
-                break
-        assert result_product is not None
-        return ProductItem(result_product, settings_path)
+        found_product = next(p for p in cls if p.folder_name in settings_path)
+        return ProductItem(found_product, settings_path)
 
 
 ProductItem = namedtuple("ProductItem", ["product", "settings_path"])
