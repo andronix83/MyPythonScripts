@@ -32,9 +32,13 @@ class TrialResetter:
         if product_codes_to_reset_str.strip().upper() == "ALL":
             products_to_reset = all_installed_products
         else:
-            product_codes_to_reset = [code.upper() for code in product_codes_to_reset_str.split(sep=" ")]
+            product_codes_to_reset = [code.strip().upper() for code in product_codes_to_reset_str.split(sep=" ")]
             products_to_reset = [product for product in all_installed_products
                                  if product.product.name in product_codes_to_reset]
+
+        if not products_to_reset:
+            print("No installed products selected for trial reset!")
+            exit(0)
 
         for product_item in products_to_reset:
             cls.__reset_product(product_item)
@@ -47,8 +51,8 @@ class TrialResetter:
 
     @classmethod
     def __is_settings_folder(cls, folder_name):
-        return any([folder_name.startswith(f".{name}")
-                    for name in Product.folders_list()])
+        return next((True for name in Product.folders_list()
+                     if folder_name.startswith(f".{name}")), False)
 
     @classmethod
     def __remove_folder(cls, folder_path):
