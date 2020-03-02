@@ -45,6 +45,7 @@ class TrialResetter:
 
     @classmethod
     def __reset_product(cls, product_item):
+        print(f"##### Resetting {product_item.product.folder_name} #####")
         cls.__remove_folder(os.path.join(product_item.settings_path, "config", "eval"))
         cls.__remove_string(os.path.join(product_item.settings_path, "config", "options", "other.xml"), "evlsprt")
         cls.__remove_reg_key(f"{cls.REG_KEY_BASE_PATH}\\{product_item.product.reg_key_name}")
@@ -56,9 +57,9 @@ class TrialResetter:
 
     @classmethod
     def __remove_folder(cls, folder_path):
-        if os.path.isdir(folder_path):
+        if os.path.exists(folder_path) and os.path.isdir(folder_path):
             shutil.rmtree(folder_path)  # for removing non-empty folder
-            print(f"Directory '{folder_path}' was removed!")
+            print(f"- Directory '{folder_path}' was removed!")
 
     @classmethod
     def __remove_string(cls, src_file_path, search_string):
@@ -72,11 +73,12 @@ class TrialResetter:
 
         os.remove(src_file_path)
         os.rename(tmp_file_path, src_file_path)
+        print(f"- Evaluation key was removed from '{src_file_path}'")
 
     @classmethod
     def __remove_reg_key(cls, reg_key_path):
         code = subprocess.call(f"reg delete \"{reg_key_path}\" /f")
-        print(code)
+        print(f"- Registry key '{reg_key_path}' was deleted. Exit code: {code}")
 
 
 if __name__ == '__main__':
