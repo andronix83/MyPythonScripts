@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 
-from jetbrains.products import Product
+from jetbrains.products import Product, ProductItem
 
 
 class TrialResetter:
@@ -24,8 +24,8 @@ class TrialResetter:
                                   for settings_path in all_settings_folders]
 
         print("\nFound the following installed JetBrains products:")
-        [print(f" - {product.product.folder_name} ({product.product.name})")
-         for product in all_installed_products]
+        for product in all_installed_products:
+            print(f" - {product.product.folder_name} ({product.product.name})")
 
         product_codes_to_reset_str = input("\nEnter the product code(s) (separated by space) or ALL to reset trial: ")
 
@@ -44,39 +44,38 @@ class TrialResetter:
             cls.__reset_product(product_item)
 
     @classmethod
-    def __reset_product(cls, product_item):
+    def __reset_product(cls, product_item: ProductItem) -> None:
         print(f"##### Resetting {product_item.product.folder_name} #####")
         cls.__remove_folder(os.path.join(product_item.settings_path, "config", "eval"))
         cls.__remove_string(os.path.join(product_item.settings_path, "config", "options", "other.xml"), "evlsprt")
         cls.__remove_reg_key(f"{cls.REG_KEY_BASE_PATH}\\{product_item.product.reg_key_name}")
 
     @classmethod
-    def __is_settings_folder(cls, folder_name):
+    def __is_settings_folder(cls, folder_name: str) -> bool:
         return next((True for name in Product.folders_list()
                      if folder_name.startswith(f".{name}")), False)
 
     @classmethod
-    def __remove_folder(cls, folder_path):
+    def __remove_folder(cls, folder_path: str) -> None:
         if os.path.exists(folder_path) and os.path.isdir(folder_path):
             shutil.rmtree(folder_path)  # for removing non-empty folder
             print(f"- Directory '{folder_path}' was removed!")
 
     @classmethod
-    def __remove_string(cls, src_file_path, search_string):
+    def __remove_string(cls, src_file_path: str, search_string: str) -> None:
         tmp_file_path = src_file_path + ".tmp"
 
-        with open(src_file_path, "r") as src_file:
-            with open(tmp_file_path, "w") as tmp_file:
-                for src_line in src_file:
-                    if search_string not in src_line:
-                        tmp_file.write(src_line)
+        with open(src_file_path, "r") as src_file, open(tmp_file_path, "w") as tmp_file:
+            for src_line in src_file:
+                if search_string not in src_line:
+                    tmp_file.write(src_line)
 
         os.remove(src_file_path)
         os.rename(tmp_file_path, src_file_path)
         print(f"- Evaluation key was removed from '{src_file_path}'")
 
     @classmethod
-    def __remove_reg_key(cls, reg_key_path):
+    def __remove_reg_key(cls, reg_key_path: str) -> None:
         code = subprocess.call(f"reg delete \"{reg_key_path}\" /f")
         print(f"- Registry key '{reg_key_path}' was deleted. Exit code: {code}")
 
@@ -85,8 +84,7 @@ if __name__ == '__main__':
     TrialResetter().start()
 
 
-# TODO Add logging to file (+ gitignore)
 # TODO Add argparse (with all support)
 # TODO Exception handling and more asserts
 # TODO Correct comments in doc-style
-# TODO use Popen and find the correct encoding
+# TODO use Popen and find the correct encoding (BUG)
