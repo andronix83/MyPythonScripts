@@ -1,19 +1,15 @@
 import json
-import random
 import re
 import textwrap
 from collections import namedtuple
 
 import requests
+from fake_useragent import UserAgent
 
 BASE_URL = "https://app.sli.do/api/v0.5/events"
 SLIDO_APP_VERSION = "SlidoParticipantApp/5.5.0 (web)"
 
-USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:74.0) Gecko/20100101 Firefox/74.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/80.0.3987.149 Safari/537.36"
-]
+USER_AGENT = UserAgent()
 
 
 def handle_cancellation(input_item: str, stop_symbol="") -> str:
@@ -60,7 +56,7 @@ def auth_new_user(event_uuid: str) -> str:
 def create_http_headers(event_uuid: str) -> dict:
     return {
         "Authorization": f"Bearer {auth_new_user(event_uuid)}",
-        "User-Agent": random.choice(USER_AGENTS),
+        "User-Agent": USER_AGENT.random,
         "x-slidoapp-version": SLIDO_APP_VERSION
     }
 
