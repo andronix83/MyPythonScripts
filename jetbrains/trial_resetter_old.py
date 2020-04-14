@@ -1,22 +1,21 @@
 import os
 import shutil
+import subprocess
 
 from jetbrains.products import Product, ProductItem
 
-# this script is intended for v. 2020.1 or newer
-class TrialResetter:
 
+# this script is intended for v. 2019.3 or older
+class TrialResetterOld:
+
+    REG_KEY_BASE_PATH = "HKEY_CURRENT_USER\\Software\\JavaSoft\\Prefs\\jetbrains"
     USER_FOLDER = os.getenv("USERPROFILE")
     assert USER_FOLDER is not None
 
     @classmethod
     def start(cls):
-        settings_dir = os.path.join(cls.USER_FOLDER, "AppData", "Roaming", "JetBrains")
-
-        all_settings_folders = None
-        if os.path.exists(settings_dir):
-            all_settings_folders = [f.path for f in os.scandir(settings_dir)
-                                    if f.is_dir() and cls.__is_settings_folder(f.name)]
+        all_settings_folders = [f.path for f in os.scandir(cls.USER_FOLDER)
+                                if f.is_dir() and cls.__is_settings_folder(f.name)]
 
         if not all_settings_folders:
             print("No JetBrains products were found on this computer!")
@@ -25,7 +24,7 @@ class TrialResetter:
         all_installed_products = [Product.product_item(settings_path)
                                   for settings_path in all_settings_folders]
 
-        print("\nFound the following installed JetBrains products (v.2020.1 or newer):")
+        print("\nFound the following installed JetBrains products (v.2019.3 or older):")
         for product in all_installed_products:
             print(f" - {product.product.folder_name} ({product.product.name})")
 
@@ -48,13 +47,14 @@ class TrialResetter:
     @classmethod
     def __reset_product(cls, product_item: ProductItem) -> None:
         print(f"##### Resetting {product_item.product.folder_name} #####")
-        cls.__remove_folder(os.path.join(product_item.settings_path, "eval"))
-        cls.__remove_string(os.path.join(product_item.settings_path, "options", "other.xml"), "evlsprt")
+        cls.__remove_folder(os.path.join(product_item.settings_path, "config", "eval"))
+        cls.__remove_string(os.path.join(product_item.settings_path, "config", "options", "other.xml"), "evlsprt")
+        cls.__remove_reg_key(f"{cls.REG_KEY_BASE_PATH}\\{product_item.product.reg_key_name}")
 
     @classmethod
     def __is_settings_folder(cls, folder_name: str) -> bool:
         return next((True for name in Product.folders_list()
-                     if folder_name.startswith(name)), False)
+                     if folder_name.startswith(f".{name}")), False)
 
     @classmethod
     def __remove_folder(cls, folder_path: str) -> None:
@@ -75,11 +75,11 @@ class TrialResetter:
         os.rename(tmp_file_path, src_file_path)
         print(f"- Evaluation key was removed from '{src_file_path}'")
 
+    @classmethod
+    def __remove_reg_key(cls, reg_key_path: str) -> None:
+        code = subprocess.call(f"reg delete \"{reg_key_path}\" /f")
+        print(f"- Registry key '{reg_key_path}' was deleted. Exit code: {code}")
+
 
 if __name__ == '__main__':
-    TrialResetter().start()
-
-
-# TODO Add argparse (with all support)
-# TODO Exception handling and more asserts
-# TODO Correct comments in doc-style
+    TrialResetterOld().start()
